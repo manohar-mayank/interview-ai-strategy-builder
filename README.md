@@ -104,6 +104,26 @@ npm run dev       # Start the API with nodemon
 
 Before deploying, set the backend environment variables in the hosting provider and configure CORS, cookies, and MongoDB network access for the production domains. The frontend API clients currently point to `http://localhost:3000`; update that API base URL to the deployed backend URL before creating the production frontend build.
 
+Set these variables in your hosting dashboards:
+
+**Backend service**
+
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+GOOGLE_GENAI_API_KEY=your_google_genai_api_key
+FRONTEND_URL=https://your-frontend-domain.com
+NODE_ENV=production
+```
+
+**Frontend service**
+
+```env
+VITE_API_URL=https://your-backend-domain.com
+```
+
+`VITE_API_URL` is read when the frontend is built, so redeploy or rebuild the frontend after changing it.
+
 Never commit `.env` files or API keys. If credentials have ever been exposed, rotate them before publishing this repository.
 
 ## Future Improvements

@@ -15,7 +15,7 @@ Preparing for an interview usually means searching through a job description, id
 - Technical questions, behavioral questions, skill-gap analysis, and preparation guidance
 - Saved interview plans for returning users
 - Generated resume PDF download
-- Responsive React interface built with Sass
+- Responsive React interface with consistent pink action styling across authentication and interview workflows
 
 ## Tech Stack
 

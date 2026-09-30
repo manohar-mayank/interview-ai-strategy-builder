@@ -7,7 +7,11 @@ const Protected = ({children}) => {
 
 
     if(loading){
-        return (<main><h1>Loading...</h1></main>)
+        return (
+            <main className="grid min-h-screen place-items-center bg-slate-950 text-slate-100">
+                <h1 className="text-3xl font-semibold">Loading...</h1>
+            </main>
+        )
     }
 
     if(!user){

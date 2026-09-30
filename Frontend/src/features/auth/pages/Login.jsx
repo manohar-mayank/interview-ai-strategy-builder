@@ -60,7 +60,7 @@ const Login = () => {
 
                     <button
                         type="submit"
-                        className="mt-2 w-full rounded-lg bg-[#e8edf5] px-3.5 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-[#f1f5f9] focus:outline-none focus:ring-2 focus:ring-slate-400/20 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="mt-2 w-full rounded-lg bg-pink-600 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400/40 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         Login
                     </button>
@@ -68,7 +68,7 @@ const Login = () => {
 
                 <p className="mt-5 text-center text-sm text-slate-400">
                     Don&apos;t have an account?{' '}
-                    <Link to="/register" className="font-medium text-slate-200 transition hover:text-white">
+                    <Link to="/register" className="font-medium text-pink-400 transition hover:text-pink-300">
                         Register
                     </Link>
                 </p>

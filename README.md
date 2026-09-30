@@ -8,13 +8,13 @@ Preparing for an interview usually means searching through a job description, id
 
 ## Features
 
-- User registration and login with JWT-based authentication
+- User registration, login, and token-revoking logout with JWT-based authentication
 - Job description and candidate profile input
 - PDF and DOCX resume upload
 - AI-generated interview strategy using Google Gemini
 - Technical questions, behavioral questions, skill-gap analysis, and preparation guidance
 - Saved interview plans for returning users
-- Generated resume PDF download
+- Generated resume PDF downloads restricted to the report owner
 - Responsive React interface with consistent pink action styling across authentication and interview workflows
 
 ## Tech Stack
@@ -25,7 +25,7 @@ Preparing for an interview usually means searching through a job description, id
 - Vite
 - React Router
 - Axios
-- Sass
+- Tailwind CSS
 
 **Backend**
 

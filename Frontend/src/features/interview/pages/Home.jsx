@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
+import { useAuth } from '../../auth/hooks/useAuth.js'
 import { useNavigate } from 'react-router'
 
 const Home = () => {
     const { loading, generateReport, reports } = useInterview()
+    const { handleLogout } = useAuth()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
     const [resumeFileName, setResumeFileName] = useState("")
@@ -31,6 +33,14 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100 md:px-6">
             <div className="mx-auto flex max-w-6xl flex-col items-center gap-8">
+                <div className="flex w-full justify-end">
+                    <button
+                        onClick={handleLogout}
+                        className="rounded-lg bg-pink-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400/40"
+                    >
+                        Log out
+                    </button>
+                </div>
                 <header className="max-w-3xl text-center">
                     <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
                         Create Your Custom <span className="text-pink-500">Interview Plan</span>

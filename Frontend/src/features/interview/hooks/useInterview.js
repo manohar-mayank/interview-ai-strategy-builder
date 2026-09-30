@@ -22,9 +22,6 @@ export const useInterview = () => {
             const interviewReport = response?.interviewReport ?? null
             if (interviewReport) setReport(interviewReport)
             return interviewReport
-        } catch (error) {
-            console.log(error)
-            return null
         } finally {
             setLoading(false)
         }

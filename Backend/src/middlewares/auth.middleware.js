@@ -39,5 +39,29 @@ async function authUser(req, res, next) {
 
 }
 
+async function optionalAuthUser(req, res, next) {
+    const token = req.cookies.token
 
-module.exports = { authUser }
+    if (!token) {
+        req.user = null
+        return next()
+    }
+
+    const isTokenBlacklisted = await tokenBlacklistModel.findOne({ token })
+
+    if (isTokenBlacklisted) {
+        req.user = null
+        return next()
+    }
+
+    try {
+        req.user = jwt.verify(token, process.env.JWT_SECRET)
+    } catch {
+        req.user = null
+    }
+
+    return next()
+}
+
+
+module.exports = { authUser, optionalAuthUser }

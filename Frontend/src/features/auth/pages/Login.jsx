@@ -8,11 +8,18 @@ const Login = () => {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await handleLogin({ email, password })
-        navigate('/')
+        setErrorMessage("")
+        const isAuthenticated = await handleLogin({ email, password })
+
+        if (isAuthenticated) {
+            navigate('/')
+        } else {
+            setErrorMessage("Sign-in failed. Check your email and password, then try again.")
+        }
     }
 
     if (loading) {
@@ -32,6 +39,8 @@ const Login = () => {
                 </div>
 
                 <p className="mb-5 text-[14px] leading-6 text-slate-400">Sign in to continue preparing for your next big role.</p>
+
+                {errorMessage && <p role="alert" className="mb-4 rounded-lg border border-rose-900/60 bg-rose-950/40 px-3.5 py-2.5 text-sm text-rose-300">{errorMessage}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">

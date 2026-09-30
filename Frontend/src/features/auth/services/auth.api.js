@@ -2,7 +2,7 @@ import axios from "axios"
 
 
 const api = axios.create({
-    baseURL: import.meta.env.PROD ? "" : import.meta.env.VITE_API_URL || "http://localhost:3000",
+    baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:3000"),
     withCredentials: true
 })
 
@@ -24,18 +24,11 @@ export async function register({ username, email, password }) {
 }
 
 export async function login({ email, password }) {
+    const response = await api.post("/api/auth/login", {
+        email, password
+    })
 
-    try {
-
-        const response = await api.post("/api/auth/login", {
-            email, password
-        })
-
-        return response.data
-
-    } catch (err) {
-        console.log(err)
-    }
+    return response.data
 
 }
 

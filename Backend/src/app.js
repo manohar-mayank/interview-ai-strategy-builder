@@ -4,11 +4,15 @@ const cors = require("cors")
 
 const app = express()
 const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "")
+const localFrontendOrigin = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/
 
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: frontendUrl,
+    origin(origin, callback) {
+        const isLocalDevelopmentOrigin = process.env.NODE_ENV !== "production" && localFrontendOrigin.test(origin || "")
+        callback(null, !origin || origin === frontendUrl || isLocalDevelopmentOrigin)
+    },
     credentials: true
 }))
 

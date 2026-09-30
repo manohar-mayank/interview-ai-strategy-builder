@@ -3,23 +3,78 @@ import { useInterview } from '../hooks/useInterview.js'
 import { useAuth } from '../../auth/hooks/useAuth.js'
 import { useNavigate } from 'react-router'
 
+const MAX_RESUME_SIZE = 5 * 1024 * 1024
+const ACCEPTED_RESUME_TYPES = {
+    ".pdf": "application/pdf",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+}
+
 const Home = () => {
     const { loading, generateReport, reports } = useInterview()
     const { handleLogout } = useAuth()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
     const [resumeFileName, setResumeFileName] = useState("")
+    const [formError, setFormError] = useState("")
+    const [generationError, setGenerationError] = useState("")
     const resumeInputRef = useRef(null)
     const navigate = useNavigate()
 
-    const canGenerateReport = Boolean(jobDescription.trim() || selfDescription.trim() || resumeFileName)
+    const canGenerateReport = Boolean(jobDescription.trim() && (selfDescription.trim() || resumeFileName))
+
+    const handleResumeChange = (event) => {
+        const file = event.target.files?.[0]
+        setFormError("")
+        setGenerationError("")
+
+        if (!file) {
+            setResumeFileName("")
+            return
+        }
+
+        const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase()
+        if (ACCEPTED_RESUME_TYPES[extension] !== file.type) {
+            setResumeFileName("")
+            event.target.value = ""
+            setFormError("Choose a PDF or DOCX resume.")
+            return
+        }
+
+        if (file.size > MAX_RESUME_SIZE) {
+            setResumeFileName("")
+            event.target.value = ""
+            setFormError("Resume must be 5 MB or smaller.")
+            return
+        }
+
+        setResumeFileName(file.name)
+    }
 
     const handleGenerateReport = async () => {
-        if (!canGenerateReport) return
+        setFormError("")
+        setGenerationError("")
+
+        if (!jobDescription.trim()) {
+            setFormError("Add the job description to continue.")
+            return
+        }
+
+        if (!selfDescription.trim() && !resumeFileName) {
+            setFormError("Upload a resume or add a self-description.")
+            return
+        }
 
         const resumeFile = resumeInputRef.current?.files?.[0]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        if (data?._id) navigate(`/interview/${data._id}`)
+        try {
+            const data = await generateReport({ jobDescription, selfDescription, resumeFile })
+            if (data?._id) {
+                navigate(`/interview/${data._id}`)
+            } else {
+                setGenerationError("We couldn't generate your plan. Check your details and try again.")
+            }
+        } catch (error) {
+            setGenerationError(error.response?.data?.message || "We couldn't generate your plan. Please try again.")
+        }
     }
 
     if (loading) {
@@ -65,7 +120,10 @@ const Home = () => {
 
                             <textarea
                                 value={jobDescription}
-                                onChange={(e) => setJobDescription(e.target.value)}
+                                onChange={(e) => {
+                                    setJobDescription(e.target.value)
+                                    setGenerationError("")
+                                }}
                                 className="h-[260px] w-full resize-none rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-500/10"
                                 placeholder="Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'"
                                 maxLength={5000}
@@ -107,7 +165,7 @@ const Home = () => {
                                         </p>
                                         <input
                                             ref={resumeInputRef}
-                                            onChange={(e) => setResumeFileName(e.target.files?.[0]?.name || "")}
+                                            onChange={handleResumeChange}
                                             hidden
                                             type="file"
                                             id="resume"
@@ -129,7 +187,10 @@ const Home = () => {
                                     </label>
                                     <textarea
                                         value={selfDescription}
-                                        onChange={(e) => setSelfDescription(e.target.value)}
+                                        onChange={(e) => {
+                                            setSelfDescription(e.target.value)
+                                            setGenerationError("")
+                                        }}
                                         id="selfDescription"
                                         name="selfDescription"
                                         className="h-28 w-full resize-none rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-500/10"
@@ -149,6 +210,12 @@ const Home = () => {
                         </div>
                     </div>
 
+                    {(formError || generationError) && (
+                        <div className="border-t border-slate-700 px-4 py-3 md:px-6" role="alert">
+                            <p className="text-sm text-rose-300">{formError || generationError}</p>
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-3 border-t border-slate-700 bg-slate-950/40 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
                         <span className="text-xs text-slate-400">Interview strategy • Approx 30s</span>
                         <button
@@ -157,7 +224,7 @@ const Home = () => {
                             className="flex items-center justify-center gap-2 rounded-xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
-                            Generate My Interview Strategy
+                            {generationError ? "Retry generation" : "Generate My Interview Strategy"}
                         </button>
                     </div>
                 </div>

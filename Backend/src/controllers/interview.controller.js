@@ -1,4 +1,6 @@
 const pdfParse = require("pdf-parse")
+const mammoth = require("mammoth")
+const path = require("node:path")
 const { generateInterviewReport, generateResumePdf } = require("../services/ai.service")
 const interviewReportModel = require("../models/interviewReport.model")
 
@@ -9,19 +11,48 @@ const interviewReportModel = require("../models/interviewReport.model")
  * @description Controller to generate interview report based on user self description, resume and job description.
  */
 async function generateInterViewReportController(req, res) {
+    const { selfDescription = "", jobDescription = "" } = req.body
 
-    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
-    const { selfDescription, jobDescription } = req.body
+    if (!jobDescription.trim()) {
+        return res.status(400).json({ message: "Add the job description before generating a plan." })
+    }
+
+    if (!req.file && !selfDescription.trim()) {
+        return res.status(400).json({ message: "Upload a resume or add a self-description." })
+    }
+
+    let resumeText = ""
+    if (req.file?.buffer) {
+        try {
+            const extension = path.extname(req.file.originalname).toLowerCase()
+            if (extension === ".pdf") {
+                if (!req.file.buffer.subarray(0, 5).toString().startsWith("%PDF-")) {
+                    return res.status(400).json({ message: "The uploaded PDF could not be read. Choose a valid PDF or DOCX resume." })
+                }
+                const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
+                resumeText = resumeContent.text
+            } else {
+                const resumeContent = await mammoth.extractRawText({ buffer: req.file.buffer })
+                resumeText = resumeContent.value
+            }
+        } catch {
+            return res.status(400).json({ message: "The uploaded resume could not be read. Choose a valid PDF or DOCX file." })
+        }
+    }
+
+    if (!resumeText.trim() && !selfDescription.trim()) {
+        return res.status(400).json({ message: "The resume contains no readable text. Add a self-description or upload another file." })
+    }
 
     const interViewReportByAi = await generateInterviewReport({
-        resume: resumeContent.text,
+        resume: resumeText,
         selfDescription,
         jobDescription
     })
 
     const interviewReport = await interviewReportModel.create({
         user: req.user.id,
-        resume: resumeContent.text,
+        resume: resumeText,
         selfDescription,
         jobDescription,
         ...interViewReportByAi

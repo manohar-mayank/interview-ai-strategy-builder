@@ -69,6 +69,8 @@ npm install
 npm run dev
 ```
 
+The backend `postinstall` script installs Puppeteer's matching Chrome browser for PDF generation.
+
 The API runs on `http://localhost:3000`.
 
 ### 2. Start the frontend

@@ -17,46 +17,49 @@ export const useInterview = () => {
 
     const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
         setLoading(true)
-        let response = null
         try {
-            response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
-            setReport(response.interviewReport)
+            const response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
+            const interviewReport = response?.interviewReport ?? null
+            if (interviewReport) setReport(interviewReport)
+            return interviewReport
         } catch (error) {
             console.log(error)
+            return null
         } finally {
             setLoading(false)
         }
-
-        return response.interviewReport
     }
 
     const getReportById = useCallback(async (interviewId) => {
         setLoading(true)
-        let response = null
         try {
-            response = await getInterviewReportById(interviewId)
-            setReport(response.interviewReport)
+            const response = await getInterviewReportById(interviewId)
+            const interviewReport = response?.interviewReport ?? null
+            setReport(interviewReport)
+            return interviewReport
         } catch (error) {
             console.log(error)
+            setReport(null)
+            return null
         } finally {
             setLoading(false)
         }
-        return response.interviewReport
     }, [ setLoading, setReport ])
 
     const getReports = useCallback(async () => {
         setLoading(true)
-        let response = null
         try {
-            response = await getAllInterviewReports()
-            setReports(response.interviewReports)
+            const response = await getAllInterviewReports()
+            const interviewReports = response?.interviewReports ?? []
+            setReports(interviewReports)
+            return interviewReports
         } catch (error) {
             console.log(error)
+            setReports([])
+            return []
         } finally {
             setLoading(false)
         }
-
-        return response.interviewReports
     }, [ setLoading, setReports ])
 
     const getResumePdf = async (interviewReportId) => {

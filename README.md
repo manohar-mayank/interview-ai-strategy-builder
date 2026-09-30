@@ -104,7 +104,7 @@ npm run dev       # Start the API with nodemon
 
 ## Deployment Notes
 
-Before deploying, set the backend environment variables in the hosting provider and configure CORS, cookies, and MongoDB network access for the production domains. The frontend API clients currently point to `http://localhost:3000`; update that API base URL to the deployed backend URL before creating the production frontend build.
+Before deploying, set the backend environment variables in the hosting provider and configure CORS, cookies, and MongoDB network access for the production domains. For Vercel, `Frontend/vercel.json` proxies `/api` requests to the Render backend so authentication cookies remain first-party in the browser. Set `FRONTEND_URL` to the exact Vercel origin and leave `VITE_API_URL` unset for the Vercel build.
 
 Set these variables in your hosting dashboards:
 
@@ -118,19 +118,10 @@ FRONTEND_URL=https://your-frontend-domain.com
 NODE_ENV=production
 ```
 
-**Frontend service**
-
-```env
-VITE_API_URL=https://your-backend-domain.com
-```
-
-`VITE_API_URL` is read when the frontend is built, so redeploy or rebuild the frontend after changing it.
-
 Never commit `.env` files or API keys. If credentials have ever been exposed, rotate them before publishing this repository.
 
 ## Future Improvements
 
-- Add a production API URL through a frontend environment variable
 - Add automated tests for authentication and report generation
 - Add deployment configuration and CI checks
 - Add interview plan sharing and progress tracking
